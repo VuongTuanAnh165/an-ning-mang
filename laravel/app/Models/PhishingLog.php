@@ -5,18 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Score extends Model
+class PhishingLog extends Model
 {
     use HasFactory;
 
-    protected $table = 'scores';
+    protected $table = 'phishing_logs';
 
     public $timestamps = true;
 
     protected $guarded = [];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 }
